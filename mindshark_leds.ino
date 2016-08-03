@@ -30,33 +30,23 @@ void setup() {
 //   - LED index = n - 2
 //   - we wait for 3 bytes specifying color
 void loop() {
-  char first_bytes[2];
-  int bytes_read = Serial.readBytes(first_bytes, 2);
-  if (bytes_read != 2) {
+  char bytes[5];
+  int bytes_read = Serial.readBytes(bytes, 5);
+  if (bytes_read != 5) {
     // Still waiting...
     return;
   }
-  int first = first_bytes[0] | (first_bytes[1] << 8);
+  int first = bytes[0] | (bytes[1] << 8);
   if (first == 0) {
-    // This used to mean something
-    return;
-  }
-  if (first == 1) {
     if (!leds.busy()) {
       leds.show();
     }
     return;
   }
-  int LED_index = first - 2;
-  char color_bytes[3];
-  bytes_read = Serial.readBytes(color_bytes, 3);
-  if (bytes_read != 3) {
-    // Should never happen, would be bad...
-    return;
-  }
-  int color = color_bytes[0]
-    | (color_bytes[1] << 8)
-    | (color_bytes[2] << 16);
+  int LED_index = first - 1;
+  int color = bytes[2]
+    | (bytes[3] << 8)
+    | (bytes[4] << 16);
   leds.setPixel(LED_index, color);
   return;
 }
